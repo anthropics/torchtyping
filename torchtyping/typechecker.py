@@ -1,7 +1,6 @@
 import inspect
 import sys
 import torch
-import typeguard
 
 from .tensor_details import _Dim, _no_name, ShapeDetail
 from .tensor_type import _AnnotatedType
@@ -261,6 +260,9 @@ unpatched_typeguard = True
 
 
 def patch_typeguard():
+    raise RuntimeError(
+        "patch_typeguard thus runtime type checking is no longer suppoed in this version"
+    )
     global unpatched_typeguard
     if unpatched_typeguard:
         unpatched_typeguard = False

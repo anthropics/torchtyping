@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 import sys
+from typing import TYPE_CHECKING, Any, NoReturn
+
 import torch
 
 from .tensor_details import (
-    _Dim,
-    _no_name,
-    is_named,
     DtypeDetail,
     LayoutDetail,
     ShapeDetail,
     TensorDetail,
+    _Dim,
+    _no_name,
+    is_named,
 )
 from .utils import frozendict
-
-from typing import Any, NoReturn
 
 # Annotated is available in python version 3.9 (PEP 593)
 if sys.version_info >= (3, 9):
@@ -29,14 +29,21 @@ _AnnotatedType = type(Annotated[torch.Tensor, ...])
 
 
 # For use when we have a plain TensorType, without any [].
-class _TensorTypeMeta(type(torch.Tensor)):
+class _TensorTypeMeta(type):
     def __instancecheck__(cls, obj: Any) -> bool:
         return isinstance(obj, cls.base_cls)
 
 
 # Inherit from torch.Tensor so that IDEs are happy to find methods on functions
 # annotated as TensorTypes.
-class TensorType(torch.Tensor, metaclass=_TensorTypeMeta):
+
+if TYPE_CHECKING:
+    __tensor = torch.Tensor
+else:
+    __tensor = object
+
+
+class TensorType(__tensor, metaclass=_TensorTypeMeta):
     base_cls = torch.Tensor
 
     def __new__(cls, *args, **kwargs) -> NoReturn:
